@@ -21,6 +21,12 @@ Random Forest regressor (RF) approach was applied to the dataset to figure out a
 The outcome of Recursive feauture elimination with cross-validation leaded also to the automatic touning of the number of MD to be selected and to set the optimal number of RF decisional trees. 
 Here are reported the plot of the relation between the Cross-validated score and the number of feauture selected when the number of decisional trees was set as 10 and 100. As can be seen, when n_trees=100, I get a higher cross validation score (>0.95). So, the number of trees was set as 100. If I increase the number of trees I would't get significant performance, it would only increase the computational cost (DOI: 10.1007/978-3-642-31537-4_13).
 
+10 trees              |  100 trees
+:-------------------------:|:-------------------------:
+![](imgs/cv_ft_10.png)  |  ![](imgs/CV_nft.png)
+
+
+
 Results:
 The number of Molecular Descriptors selected was 10, and they are:
 * apol -> Electronic Descriptor
