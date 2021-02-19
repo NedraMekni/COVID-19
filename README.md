@@ -58,7 +58,7 @@ Results:
 best parameters  {'C': 100.0, 'epsilon': 1.0, 'gamma': 0.01, 'kernel': 'rbf'}
 
 ## Evaluation
-The SVR model was evaluated using the test set. R square, MSE (mean square error), MAE(mean absolute error) and RMSE (root mean squared error) metric was calculated.
+The SVR model was evaluated using the test set. R square, MSE (mean square error), MAE(mean absolute error) and RMSE (root mean squared error) metric were calculated.
 
 Results:
 * Mean Absolute Error: 4.083445516968702
