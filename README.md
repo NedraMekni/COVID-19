@@ -26,7 +26,7 @@ Results:
 After the cleaning steps 1063 out of 1150 columns (molecular descriptors) were deleted.
 87 Molecular descriptors were preserved.
 
-## Feauture Selection
+## Feature Selection
 Random Forest regressor (RF) approach was applied to the dataset to figure out a set of chemical descriptors related to bioactivity proprieties (IC50) from 1150 molecular descriptors calculated. Moreover a recursive feauture elimination and cross-validated selection were performed over the RF in order to detect the most important descriptors --> You'll wrap a Recursive Feature Eliminator around a random forest model to remove features step by step. 
 The outcome of Recursive feauture elimination with cross-validation leaded also to the automatic touning of the number of MD to be selected and to set the optimal number of RF decisional trees. 
 Here are reported the plot of the relation between the Cross-validated score and the number of feauture selected when the number of decisional trees was set as 10 and 100. As can be seen, when n_trees=100, I get a higher cross validation score (>0.95). So, the number of trees was set as 100. If I increase the number of trees I would't get significant performance, it would only increase the computational cost (DOI: 10.1007/978-3-642-31537-4_13).
