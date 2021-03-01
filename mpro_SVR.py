@@ -23,11 +23,18 @@ from collections.abc import Iterable
 fname='./PostEra_392_no_dipl.csv'
 
 
+'''
+imputing_missing_values(array)
 
+fills missing values (NaN) with the mean value of the column
+'''
 def imputing_missing_values(data):
 	return SimpleImputer(missing_values=np.NaN, strategy='mean')
+'''
+write_ft(titles, features)
 
-
+write in 'ft_selected.txt' file the features from the index list 'features' 
+'''
 def write_ft(titles,features):
 	print(titles)
 	print(len(titles))
@@ -36,13 +43,20 @@ def write_ft(titles,features):
 			f.write(titles[ft]+'\n')
 
 
-		
+	
 '''
+read_data(fname,target,excluded=[])
+
+read fname file, assign label index in target
 target:   int, index of classification result
-excluded: list, indexes to be excluded for each line
+
+optionally indicating in excluded list the index feauture to be ignored
+
+In titles are stored the name of the MDs,
+In classification are stored the activity data (IC50 values)
+
+returns the np.array representation of file 'fname'
 '''
-
-
 def read_data(fname,target,excluded=[]):
 	classification,titles,data = [],[],[]
 	
@@ -56,6 +70,13 @@ def read_data(fname,target,excluded=[]):
 			data.append([float(line[i]) if len(line[i])>0 else np.NaN for i in range(len(line)) if i not in excluded and i != target ]) 
 	return np.array(data),np.array(classification),titles
 
+'''
+constant_columns(data)
+
+delete columns having the same values
+returns matrix withot constant colums
+
+'''
 def constant_columns(X):
 	X = X.transpose()
 	col_0s = [i1  for i1 in range(len(X)) if all([X[i1][i]==X[i1][0] for i in range(len(X[0]))])]
@@ -73,9 +94,14 @@ where:
 
 The target values y (class labels in classification, real numbers in regression).
 
+feature_selection_RFECV_reg(X,y,n_tree)
+Application of RFECV on Training set X,y by using 'n_tree' trees
+Returns a list of selected features's index
+
+Feature selection with Random Forest, combined to ecursive feature elimination and cross validation.
+Source: https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFECV.html)
 
 '''
-
 def feature_selection_RFECV_reg(X,y,n_tree):
 	sel = RandomForestRegressor(n_estimators=n_tree,random_state=0)
 	rfecv = RFECV(estimator=sel, step=1, scoring='r2')
@@ -94,7 +120,13 @@ def feature_selection_RFECV_reg(X,y,n_tree):
 	return [i for i in range(len(selector.support_)) if selector.support_[i]==True]
 
 
+'''
+show_heatmap(X_train)
+X_train is the cleaned training set
 
+Calculates the correlation that exist between Molecular descriptors
+Shows correlation with a heatmap
+'''
 def show_heatmap(X_train):
 	correlation_mat_clean=X_train.corr().abs()
 	upper_half=correlation_mat_clean.where(np.triu(np.ones(correlation_mat_clean.shape), k=1).astype(np.bool))
@@ -106,7 +138,10 @@ def show_heatmap(X_train):
 def log(X, s):
 	print('#'*10+'\nlenght of {}: {}\n length of one line of {}: {}\n{}\n'.format(s,len(X),s,1 if not isinstance(X[0], Iterable) else len(X[0]),X)+'#'*10)
 
-
+'''
+dump_model(fname,model,X_test,y_test)
+Export the trained model in fname file
+'''
 def dump_model(fname,model,X_test,y_test):
 	joblib.dump(model, fname)
 
