@@ -236,6 +236,9 @@ if __name__ == '__main__':
 	X_test=np.array(X_test)
 	scaler = StandardScaler()
 	X_train = scaler.fit_transform(X_train)
+	#Export Scaler
+	joblib.dump(scaler, 'std_scaler.bin', compress=True)
+	open('dimension_for_scaler.txt','w').write(str(titles))
 	# test is normalized according to train scaler
 	X_test = scaler.transform(X_test)
 
