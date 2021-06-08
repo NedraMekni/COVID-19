@@ -27,22 +27,10 @@ from numpy import transpose
 from collections.abc import Iterable
 from sklearn.metrics import confusion_matrix
 
-#fname='./PostEra_data_17_03_all_MD.csv'
-#fname='./molecular_descriptor_mpro_maestro_620-out.csv'
-#fname='./PostEra_data_17_03_all_MD.csv'
-fname='./PostEra_data_log_17_03_ic50_pic50_filt_2.csv'
-#fname='./PostEra_data_log_20_03_FP.csv'
-#fname='./PostEra_data_log_20_03_no_duplicates_MD_FP.csv'
-#fname = 'prova.csv'
+#Put in fname the csv file of the molecular descriptors calculated for each molecule
 
-#activity_treshold
+fname = 'PostEra_392_no_dipl.csv'
 
-'''
-class my_SVR(SVR):
-    def fit(self, *args, **kwargs):
-        super(my_SVR, self).fit(*args, **kwargs)
-        self.coef_ = self.feature_importances_
-'''
 '''
 imputing_missing_values(array)
 
@@ -56,8 +44,6 @@ write_ft(titles, features)
 write in 'ft_selected.txt' file the features from the index list 'features' 
 '''
 def write_ft(titles,features):
-    #print(titles)
-    #print(len(titles))
     with open('ft_selected.txt','w') as f:
         for ft in features:
             f.write(titles[ft]+'\n')
@@ -81,11 +67,11 @@ def read_data(fname,target,excluded=[]):
     classification,titles,data = [],[],[]
     
     with open (fname, 'r') as ds:
-        titles=ds.readline().strip().split(';')
+        titles=ds.readline().strip().split(',')
         target=len(titles)+target if target<0 else target
         titles=[titles[i] for i in range(len(titles)) if i not in excluded and i != target]
         for x in ds:
-            line=x.strip().split(';')
+            line=x.strip().split(',')
             classification.append(float(line[target]))
             data.append([float(line[i]) if len(line[i])>0 else np.NaN for i in range(len(line)) if i not in excluded and i != target ]) 
     return np.array(data),np.array(classification),titles
@@ -100,8 +86,6 @@ returns matrix withot constant colums
 def constant_columns(X):
     X = X.transpose()
     col_0s = [i1  for i1 in range(len(X)) if all([X[i1][i]==X[i1][0] for i in range(len(X[0]))])]
-    #print('Deleting columns {}'.format(col_0s))
-    #print(len(col_0s))
     return col_0s
 
 
@@ -124,12 +108,10 @@ Source: https://scikit-learn.org/stable/modules/generated/sklearn.feature_select
 '''
 def feature_selection_RFECV(X,y,n_tree):
     sel = RandomForestClassifier(n_estimators=n_tree, random_state=40)
-    #sel =linear_model.Lars()
     rfecv = RFECV(estimator=sel, step=1,cv=StratifiedKFold(5),   scoring='accuracy')
 
     selector = rfecv.fit(X,y)
-    #print(selector.support_)
-    #print(selector.ranking_)
+    
 
     print("\tOptimal number of features : %d" % selector.n_features_)
     # Plot number of features VS. cross-validation scores
@@ -150,8 +132,6 @@ def exclude_duplicates_rows(X,y):
 			h_dict[digest]=[(X[i],y[i])]
 		else:
 			h_dict[digest]+=[(X[i],y[i])]
-		#dop.add(i)
-		#dop.add(i1)
 	for v in h_dict.values():
 		if len(v)==1:
 			new_X+=[v[0][0]]
@@ -159,7 +139,6 @@ def exclude_duplicates_rows(X,y):
 		else:
 			if(len(set(([int(el[1]) for el in v])))==1):
 				for el in v:
-					# avg =
 					mean = np.mean([e[1] for e in v])
 					new_X+=[el[0]]
 					new_y+=[mean]
@@ -207,8 +186,7 @@ if __name__ == '__main__':
     n_tree = int(sys.argv[1])
     correlation_index=float(sys.argv[2])
     print('n_tree = {}, corr_index = {}'.format(n_tree,correlation_index))
-    #print('INPUT: n_tree {}'.format(n_tree))
-
+    
 
     target, excluded = -1,[0] # target = cluster col, excluded = list of columns to exclude
 
@@ -233,18 +211,7 @@ if __name__ == '__main__':
     #log(X_test,'X_test after train_test_split')
     #log(y_train,'y_train after train_test_split')
     #log(y_test,'y_test after train_test_split')
-    #y_train=[2 if el<=30 else 1 if el <=60 else 0 for el in y_train]
-    #y_test=[2 if el<=30 else 1 if el<=60 else 0 for el in y_test]
 
-    #target_scaler = MinMaxScaler()
-    #y_train = target_scaler.fit_transform(y_train.reshape(-1,1))
-    #y_test = target_scaler.transform(y_test.reshape(-1,1))
-    #y_train = y_train.reshape(1,-1)[0]
-    #y_test = y_test.reshape(1,-1)[0]
-    #n_bin = math.ceil((max(y_train)-min(y_train))) // len(y_train)
-    #print(max(y_train)-min(y_train))
-    #print(n_bin)
-    #exit()
     enc = KBinsDiscretizer(n_bins=2,encode='ordinal',strategy='uniform')
     y_orig = y_test
     y_train = enc.fit_transform(y_train.reshape(-1,1))
@@ -254,18 +221,7 @@ if __name__ == '__main__':
 
     
     y_test = y_test.reshape(1,-1)[0]
-    #y_train=[0 if el<activity_treshold else 1 for el in y_train]
-    #y_test=[0 if el<activity_treshold else 1 for el in y_test]
-
-    #print(y_test)
-    #y_train = [0 if el<15 else 1 for el in y_train]
-    #y_test = [0 if el<15 else 1 for el in y_test]
-    #print(y_test)
-    #exit()
-    #print(y_test)
-    #print(max(y_train))
-    #print(min(y_train))
-    #exit()
+    
     # managing NULL values
     
     imp = imputing_missing_values(X_train)
@@ -284,10 +240,10 @@ if __name__ == '__main__':
     # Correlation matrix    
     df=pd.DataFrame(X_train, columns=titles)
 
-    #print(df)
+   
 
     correlation_mat=df.corr().abs()
-    #print(correlation_mat.shape)
+    
     upper_half=correlation_mat.where(np.triu(np.ones(correlation_mat.shape), k=1).astype(np.bool))
     
     # High correlated descriptors to remove
@@ -296,8 +252,6 @@ if __name__ == '__main__':
     #show_heatmap(df)
     X_train_clean=df.drop(df[to_drop], axis=1)
 
-    # Write csv
-    #X_train_clean.to_csv('dataset_cleaned.csv')
 
     # Show heatmap  
     #show_heatmap(X_train_clean)
@@ -321,9 +275,11 @@ if __name__ == '__main__':
     X_test=np.array(X_test)
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
+    
     #Export Scaler
     joblib.dump(scaler, 'std_scaler.bin', compress=True)
     open('dimension_for_scaler.txt','w').write(str(titles))
+    
     # test is normalized according to train scaler
     X_test = scaler.transform(X_test)
 
@@ -334,7 +290,7 @@ if __name__ == '__main__':
     
 
     ft_indices = feature_selection_RFECV(X_train,y_train,n_tree)
-    #print([titles[i] for i in ft_indices])
+    
     write_ft(titles,ft_indices)
     X_train = [[el[i] for i in range(len(el)) if i in ft_indices] for el in X_train]
     X_test = [[el[i] for i in range(len(el)) if i in ft_indices] for el in X_test]
@@ -353,28 +309,18 @@ if __name__ == '__main__':
 
 
     svc=svm.SVC()
-    #print('GridSearchCV\n'+'-'*12)
+   
     clf = GridSearchCV(svc, parameters)
     clf.fit(X_train,y_train)
     f=clf.best_params_
-    #print('best parameters ', f)
-    #print('-'*12)
-
-
+    
     confidence=clf.score(X_test,y_test)
 
     y_pred=clf.predict(X_test)
     
-    #print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
-    #print("Precision: ", metrics.precision_score(y_test,y_pred,average='macro')) 
-    # saving model
-    #print(confusion_matrix(y_test,y_pred))
-    #print(y_test)
-    #print(y_orig)
-    #print(y_pred)
-    #print(y)
+    
     dump_model('Classifier.sav',clf,X_test,y_test)
 
     evaluation(y_pred,y_test)
-    print('#'*10)
+
     
